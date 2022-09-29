@@ -1,14 +1,9 @@
 import React, { useState } from "react";
 
-function QuestionForm(props) {
-  const [formData, setFormData] = useState({
-    prompt: "",
-    answer1: "",
-    answer2: "",
-    answer3: "",
-    answer4: "",
-    correctIndex: 0,
-  });
+function QuestionForm({handleAddQuestion}) {
+  
+  const defaultState = {prompt: "", answer1: "", answer2: "",answer3: "", answer4: "", correctIndex: 0}
+  const [formData, setFormData] = useState(defaultState);
 
   function handleChange(event) {
     setFormData({
@@ -16,10 +11,32 @@ function QuestionForm(props) {
       [event.target.name]: event.target.value,
     });
   }
-
+  function improveFormatting(data){
+    return {
+      prompt: data.prompt,
+      answers:[data.answer1,data.answer2,data.answer3,data.answer4],
+      correctIndex:data.correctIndex
+    }
+  }
   function handleSubmit(event) {
     event.preventDefault();
-    console.log(formData);
+    
+  
+   // console.log(formData);
+  
+    fetch('http://localhost:4000/questions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify(improveFormatting(formData))
+    })
+    .then(result => result.json())
+    .then(data => { setFormData(defaultState)
+      handleAddQuestion(data)
+      
+    });
   }
 
   return (
